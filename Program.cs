@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+Console.Clear();
 Console.WriteLine(@"  \  |      |           |         \  |            |
  |\/ |  _ \ |  _ \   _` | |   |  |\/ |  _` |  __| __|
  |   |  __/ | (   | (   | |   |  |   | (   | |    |
@@ -120,7 +121,7 @@ List<Product> products = new List<Product>()
     }
 };
 
-Console.Clear();
+
 string greeting = @"Welcome to Melody Mart
 Get your shit and get out";
 
@@ -152,7 +153,10 @@ while (choice != "0")
             TheCleanerUpper();
             break;
         case "2":
-            throw new NotImplementedException("Feature not available, dumbass");
+            Console.Clear();
+            ViewProductsByType();
+            TheCleanerUpper();
+            break;
         case "3":
             throw new NotImplementedException("Feature not available, dumbass");
         case "4":
@@ -193,32 +197,77 @@ void ViewAllProducts()
         Console.WriteLine($"{i + 1}. {products[i].Name} {(products[i].DateSold == null ? "is available" : "was sold")} for ${products[i].Price}");
     }
 }
+
+void ViewProductsByType()
+{
+    Console.Clear();
+    Console.WriteLine($"Please select a category of products to view:");
+
+    foreach (ProductType type in productTypes)
+    {
+        Console.WriteLine($"{type.Id}. {type.Title}");
+    }
+    // refactor to have while loop
+    int choice = int.Parse(Console.ReadLine());
+
+    Console.Clear();
+
+    List<Product> selectedProducts = products.Where(p => p.ProductTypeId == choice).ToList();
+
+    for (int i = 0; i < selectedProducts.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}. {selectedProducts[i].Name}");
+    };
+}
+
 void RemoveProduct()
 {
     Console.WriteLine("Please choose a product to remove:");
+
     ViewAllProducts();
-    //need to put in a while and refactor
-    try
+
+    string choice = null;
+    while (choice == null)
     {
-        int response = int.Parse(Console.ReadLine().Trim());
-        products.RemoveAt(response - 1);
-    }
-    catch (FormatException)
-    {
-        Console.WriteLine("Please type only integers!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex);
-        Console.WriteLine("Do Better!");
+        try
+        {
+            int response = int.Parse(Console.ReadLine().Trim());
+            products.RemoveAt(response - 1);
+            choice = response.ToString();
+        }
+        catch (FormatException)
+        {
+            Console.WriteLine("Please type only integers!");
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            Console.WriteLine("Please pick an actual option!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Console.WriteLine("Do Better!");
+        }
     }
 }
+
+void PurchaseProduct()
+{
+    Console.WriteLine("Please choose a product to purchase:");
+    ViewAllProducts();
+    List<Product> purchaseableProducts = products.Where(p => p.DateSold == null).ToList();
+    for (int i = 0; i < purchaseableProducts.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}. {purchaseableProducts[i].Name}");
+    }
+    int response = int.Parse(Console.ReadLine());
+    // need to find item being purchased and update
+}
+
 /*
 
-1. Show by type
 1. Be able to purchase instrument
 1. Post new instrument
-1. Remove from inventory
 1. See how long an item has been in inventory
     1. See details
 1. Update prices
